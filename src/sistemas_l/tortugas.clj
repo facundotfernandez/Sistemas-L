@@ -22,17 +22,15 @@
               :pluma       p})
   ([tortuga] (into {} tortuga)))
 
-(defn avanzar [distancia tortuga]
-  (let [x0 (get tortuga :x)
-        y0 (get tortuga :y)
-        angGrad (get tortuga :orientacion)
-        angRad (* angGrad (/ Math/PI 180))
-        x1 (int (+ x0 (* distancia (Math/cos angRad))))
-        y1 (int (+ y0 (* distancia (Math/sin angRad))))]
-    (merge tortuga {:x x1 :y y1 :pluma false})))
+(defn avanzar [distancia {:keys [x y orientacion] :as tortuga}]
+  (let [angRad (* orientacion (/ Math/PI 180))
+        dx (* distancia (Math/cos angRad))
+        dy (* distancia (Math/sin angRad))]
+    (assoc tortuga :x (+ x (int dx)) :y (+ y (int dy)) :pluma false)))
 
-(defn avanzar-y-dibujar [distancia tortuga]
-  (merge (avanzar distancia tortuga)) {:pluma true})
+(defn avanzar-y-dibujar [distancia {:keys [pluma] :as tortuga}]
+  (-> (avanzar distancia tortuga)
+      (assoc :pluma true)))
 
 (defn derecha [angulo tortuga]
   (let [angGrad (get tortuga :orientacion)]
@@ -42,13 +40,13 @@
   (derecha (* angulo -1) tortuga))
 
 (defn crear-tortugas [op distancia angulo]
-  (let [alfabeto {\F #(avanzar distancia %)
-                  \G #(avanzar distancia %)
-                  \f #(avanzar-y-dibujar distancia %)
-                  \g #(avanzar-y-dibujar distancia %)
+  (let [alfabeto {\F #(avanzar-y-dibujar distancia %)
+                  \G #(avanzar-y-dibujar distancia %)
+                  \f #(avanzar distancia %)
+                  \g #(avanzar distancia %)
                   \+ #(derecha angulo %)
                   \- #(izquierda angulo %)
-                  \| #(izquierda 180 %)}
+                  \| #(izquierda 0 %)}
         origen (crear-tortuga)]
     (loop [operaciones op
            tortugas [origen]
