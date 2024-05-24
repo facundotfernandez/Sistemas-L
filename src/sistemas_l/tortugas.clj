@@ -8,29 +8,32 @@
     x - Coordenada X (Píxeles).
     y - Coordenada Y (Píxeles).
     o - Orientación del siguiente movimiento (Ángulo).
-    p - Estado de la pluma (arriba o abajo).
+    p - Estado de la pluma (activa o inactiva).
 
   Retorna:
     Crea una tortuga con estado inicial o basado en el estado dado"
   ([] {:x           0
        :y           0
        :orientacion 180
-       :pluma       false})
+       :pluma       true})
   ([x y o p] {:x           x
               :y           y
               :orientacion o
               :pluma       p})
   ([tortuga] (into {} tortuga)))
 
+(defn bajar-pluma [tortuga]
+  (assoc tortuga :pluma false))
+
 (defn avanzar [distancia {:keys [x y orientacion] :as tortuga}]
   (let [angRad (* orientacion (/ Math/PI 180))
         dx (* distancia (Math/cos angRad))
         dy (* distancia (Math/sin angRad))]
-    (assoc tortuga :x (+ x (int dx)) :y (+ y (int dy)) :pluma false)))
+    (assoc tortuga :x (+ x (int dx)) :y (+ y (int dy)))))
 
-(defn avanzar-y-dibujar [distancia {:keys [pluma] :as tortuga}]
-  (-> (avanzar distancia tortuga)
-      (assoc :pluma true)))
+(defn avanzar-y-dibujar [distancia tortuga]
+  (let [tortuga-dibujante (-> (avanzar distancia tortuga) (assoc :pluma true))]
+    [tortuga-dibujante (bajar-pluma tortuga-dibujante)]))
 
 (defn derecha [angulo tortuga]
   (let [angGrad (get tortuga :orientacion)]
@@ -39,11 +42,12 @@
 (defn izquierda [angulo tortuga]
   (derecha (* angulo -1) tortuga))
 
+
 (defn crear-tortugas [op distancia angulo]
-  (let [alfabeto {\F #(avanzar-y-dibujar distancia %)
-                  \G #(avanzar-y-dibujar distancia %)
-                  \f #(avanzar distancia %)
-                  \g #(avanzar distancia %)
+  (let [alfabeto {\F #(avanzar distancia %)
+                  \G #(avanzar distancia %)
+                  \f #(avanzar-y-dibujar distancia %)
+                  \g #(avanzar-y-dibujar distancia %)
                   \+ #(derecha angulo %)
                   \- #(izquierda angulo %)
                   \| #(izquierda 0 %)}

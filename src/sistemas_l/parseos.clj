@@ -35,15 +35,12 @@
                   {:angulo    angulo
                    :axioma    axioma
                    :reglas    reglas
-                   :distancia 5})))))
+                   :distancia 10})))))
 
-(defn parse2lines [trayectoria]
-  (let [movimientos (partition 2 1 trayectoria)]
-    (map (fn [[p1 p2]]
-           (str "<line x1=\"" (:x p1) "\" y1=\"" (:y p1) "\" x2=\"" (:x p2) "\" y2=\"" (:y p2) "\" stroke=\"black\" stroke-width=\"1\" />"))
-         movimientos)))
+;(defn parse2lines [tortugas]
+;    (map (str "<line x1=\"" (:x p1) "\" y1=\"" (:y p1) "\" x2=\"" (:x p2) "\" y2=\"" (:y p2) "\" stroke=\"black\" stroke-width=\"1\" />") #(tortugas)))
 
-(defn parse2svg [tortugas]
-  (let [trayectorias (map :trayectoria tortugas)
-        lineas-svg (apply str (mapcat parse2lines trayectorias))]
-    (str "<svg viewBox=\"-50 -150 300 200\" xmlns=\"http://www.w3.org/2000/svg\">\n" lineas-svg "\n</svg>")))
+;;(defn parse2svg [tortugas]
+; (let [trayectorias (map :trayectoria tortugas)
+;       lineas-svg (apply str (mapcat parse2lines trayectorias))]
+;   (str "<svg viewBox=\"-50 -150 300 200\" xmlns=\"http://www.w3.org/2000/svg\">\n" lineas-svg "\n</svg>")))
