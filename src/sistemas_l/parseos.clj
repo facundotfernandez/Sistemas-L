@@ -29,13 +29,18 @@
     (let [angulo (read-string (.readLine archivo))
           axioma (.readLine archivo)]
       (loop [regla (.readLine archivo) reglas {}]
-        (if regla (let [[p s] (string/split regla #" ")]
-                    (recur (.readLine archivo),
-                           (assoc reglas (string/trim p) (string/trim s))))
-                  {:angulo    angulo
-                   :axioma    axioma
-                   :reglas    reglas
-                   :distancia 10})))))
+        (if regla
+          (let [[p s] (string/split regla #" ")]
+            (recur (.readLine archivo), (assoc reglas (string/trim p) (string/trim s))))
+          {:angulo    angulo
+           :axioma    axioma
+           :reglas    reglas
+           :distancia 10})))))
+
+(defn parse-op-final [reglas operaciones iteraciones]
+  (if (zero? iteraciones)
+    operaciones
+    (recur reglas (parse-op reglas operaciones) (dec iteraciones))))
 
 ;(defn parse2lines [tortugas]
 ;    (map (str "<line x1=\"" (:x p1) "\" y1=\"" (:y p1) "\" x2=\"" (:x p2) "\" y2=\"" (:y p2) "\" stroke=\"black\" stroke-width=\"1\" />") #(tortugas)))
