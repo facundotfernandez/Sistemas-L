@@ -14,7 +14,7 @@
     Crea una tortuga con estado inicial o basado en el estado dado"
   ([] {:x           0
        :y           0
-       :orientacion 0
+       :orientacion 270
        :pluma       true})
   ([tortuga] (into {} tortuga)))
 
