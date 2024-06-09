@@ -9,9 +9,5 @@
   (let [info (generar-info ruta-sl)] (parseos/parse-op-final (:reglas info) (:axioma info) iteraciones)))
 
 (defn -main [ruta-sl iter ruta-svg]
-  ; Pruebas iniciales
   (let [parseo-test (generar-operaciones ruta-sl (int (read-string iter))) info (generar-info ruta-sl)]
-    ;(println parseo-test)
-    ;(println (doseq [tortuga (tortugas/crear-tortugas parseo-test (:distancia info) (:angulo info))] (println "x:" (:x tortuga) ", y:" (:y tortuga) ", ang:" (:orientacion tortuga) ", pluma:" (:pluma tortuga))))
-    ;(println (tortugas/crear-tortugas parseo-test (:distancia info) (:angulo info)))
     (parseos/parse2svg (tortugas/crear-tortugas parseo-test (:distancia info) (:angulo info)) ruta-svg)))

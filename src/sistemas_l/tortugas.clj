@@ -12,11 +12,10 @@
 
   Retorna:
     Crea una tortuga con estado inicial o basado en el estado dado"
-  ([] {:x           0
-       :y           0
+  ([] {:x           (double 0)
+       :y           (double 0)
        :orientacion 270
-       :pluma       true})
-  ([tortuga] (into {} tortuga)))
+       :pluma       true}))
 
 (defn bajar-pluma [tortuga]
   (assoc tortuga :pluma false))
@@ -38,7 +37,7 @@
     (merge tortuga {:orientacion (mod (+ angGrad angulo) 360)})))
 
 (defn derecha [angulo tortuga]
-  (izquierda (* angulo -1) tortuga))
+  (izquierda (- angulo) tortuga))
 
 (defn crear-tortugas [op distancia angulo]
   (let [alfabeto {\F #(avanzar distancia %)

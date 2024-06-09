@@ -1,8 +1,7 @@
 (ns sistemas-l.parseos
   (:gen-class)
   (:require [clojure.java.io :as io]
-            [clojure.string :as string]
-            [sistemas-l.tortugas]))
+            [clojure.string :as string]))
 
 (defn parse-op
   "Toma la operación y reemplaza cada caracter por el valor de la regla aplicada a él, si existe.
@@ -26,56 +25,60 @@
     Un nuevo hashmap con el ángulo, axioma y un hashmap de reglas, en base a la información del archivo leído"
   [ruta-sl]
   (with-open [archivo (io/reader ruta-sl)]
-    (let [angulo (read-string (.readLine archivo))
-          axioma (.readLine archivo)]
-      (loop [regla (.readLine archivo) reglas {}]
-        (if regla
-          (let [[p s] (string/split regla #" ")]
-            (recur (.readLine archivo), (assoc reglas (string/trim p) (string/trim s))))
-          {:angulo    angulo
-           :axioma    axioma
-           :reglas    reglas
-           :distancia 10})))))
+    (let [[angulo axioma & reglas] (line-seq archivo)
+          reglas (into {} (map #(let [[p s] (string/split % #" ")] [(string/trim p) (string/trim s)])) reglas)]
+      {:angulo    (read-string angulo)
+       :axioma    axioma
+       :reglas    reglas
+       :distancia 10})))
 
 (defn parse-op-final [reglas operaciones iteraciones]
   (if (zero? iteraciones)
     operaciones
     (recur reglas (parse-op reglas operaciones) (dec iteraciones))))
 
-(defn parse-instruccion [origen destino]
-  (let [x1 (:x origen) y1 (:y origen) p1 (:pluma origen)
-        x2 (:x destino) y2 (:y destino) p2 (:pluma destino)
-        tipo (if p2 " L" " M")]
-    (string/join " " [tipo (format "%.4f" x2) (format "%.4f" y2)])))
+(defn parse-mov [destino]
+  (let [{:keys [x y pluma]} destino]
+    (string/join " " [(if pluma " L" " M") (format "%.4f" x) (format "%.4f" y)])))
 
 (defn actualizar-info [origen
                        destino
                        {:keys [contenido min-x min-y max-x max-y] :as info}]
-  (let [x1 (:x origen) y1 (:y origen) o1 (:orientacion origen) p1 (:pluma origen)
-        x2 (:x destino) y2 (:y destino) o2 (:orientacion origen) p2 (:pluma destino)]
-    (if (and (= x1 x2) (= y1 y2) (= o1 o2) (= p1 p2))
+  (let [{x1 :x y1 :y p1 :pluma} origen
+        {x2 :x y2 :y p2 :pluma} destino]
+    (if (and (= x1 x2) (= y1 y2) (= p1 p2))
       info
-      (assoc info :contenido (apply str contenido (parse-instruccion origen destino))
+      (assoc info :contenido (apply str contenido (parse-mov destino))
                   :min-x (min min-x x2)
                   :min-y (min min-y y2)
                   :max-x (max max-x x2)
                   :max-y (max max-y y2)))))
 
 (defn parse2path [tortugas]
-  (loop [origen (first tortugas)
-         destino (second tortugas)
-         restantes (rest tortugas)
-         info {:contenido (str "<path d=\"M 0 0")
-               :min-x     (:x origen)
-               :min-y     (:y origen)
-               :max-x     (:x origen)
-               :max-y     (:y origen)}]
-    (if (empty? restantes)
-      (assoc info :contenido (apply str (get info :contenido) "\" stroke-width=\"1\" stroke=\"black\" fill=\"none\"></path>"))
-      (recur destino (first restantes) (rest restantes) (actualizar-info origen destino info)))))
+  (let []
+    (loop [origen (first tortugas)
+           restantes (rest tortugas)
+           info {:contenido "<path d=\"M 0 0"
+                 :min-x     (:x origen)
+                 :min-y     (:y origen)
+                 :max-x     (:x origen)
+                 :max-y     (:y origen)}]
+      (if (empty? restantes)
+        (assoc info :contenido (str (:contenido info) "\" stroke-width=\"1\" stroke=\"black\" fill=\"none\"></path>"))
+        (recur (first restantes) (rest restantes) (actualizar-info origen (first restantes) info))))))
 
 (defn parse2svg [tortugas ruta-svg]
   (let [info (parse2path tortugas)
-        margen 10]
+        margen 50
+        min-x (get info :min-x)
+        min-y (get info :min-y)
+        max-x (get info :max-x)
+        max-y (get info :max-y)]
     (with-open [archivo (io/writer ruta-svg :encoding "UTF-8")]
-      (spit archivo (apply str "<svg viewBox=\"" (string/join " " [(- (get info :min-x) margen) (- (get info :min-y) margen) (+ (* 2 margen) (- (get info :max-x) (get info :min-x))) (+ (* 2 margen) (- (get info :max-y) (get info :min-y)))]) "\" xmlns=\"http://www.w3.org/2000/svg\">\n" (apply str (get info :contenido)) "\n</svg>")))))
+      (spit archivo (str "<svg viewBox=\""
+                         (- min-x margen) " "
+                         (- min-y margen) " "
+                         (+ (* 2 margen) (- max-x min-x)) " "
+                         (+ (* 2 margen) (- max-y min-y))
+                         "\" xmlns=\"http://www.w3.org/2000/svg\">\n"
+                         (get info :contenido) "\n</svg>")))))
