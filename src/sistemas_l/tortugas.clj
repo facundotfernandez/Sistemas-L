@@ -28,27 +28,26 @@
   (let [angRad (* orientacion (/ Math/PI 180))
         dx (* distancia (Math/cos angRad))
         dy (* distancia (Math/sin angRad))]
-    (assoc tortuga :x (+ x (int dx)) :y (+ y (int dy)))))
+    (assoc tortuga :x (double (+ x dx)) :y (double (+ y dy)) :pluma true)))
 
 (defn avanzar-sin-dibujar [distancia tortuga]
-  (let [tortuga-dibujante (-> (avanzar distancia tortuga) subir-pluma)]
-    [tortuga-dibujante (bajar-pluma tortuga-dibujante)]))
-
-(defn derecha [angulo tortuga]
-  (let [angGrad (get tortuga :orientacion)]
-    (merge tortuga {:orientacion (mod (- angGrad angulo) 360)})))
+  (->> tortuga (subir-pluma) (avanzar distancia) (bajar-pluma)))
 
 (defn izquierda [angulo tortuga]
-  (derecha (* angulo -1) tortuga))
+  (let [angGrad (get tortuga :orientacion)]
+    (merge tortuga {:orientacion (mod (+ angGrad angulo) 360)})))
+
+(defn derecha [angulo tortuga]
+  (izquierda (* angulo -1) tortuga))
 
 (defn crear-tortugas [op distancia angulo]
   (let [alfabeto {\F #(avanzar distancia %)
                   \G #(avanzar distancia %)
                   \f #(avanzar-sin-dibujar distancia %)
                   \g #(avanzar-sin-dibujar distancia %)
-                  \+ #(derecha angulo %)
-                  \- #(izquierda angulo %)
-                  \| #(izquierda 180 %)}]
+                  \+ #(izquierda angulo %)
+                  \- #(derecha angulo %)
+                  \| #(derecha 180 %)}]
     (loop [operaciones op
            tortugas [(crear-tortuga)]
            aux (vector)]
@@ -58,7 +57,7 @@
               restantes (rest operaciones)
               tortuga-actual (peek tortugas)]
           (case operacion
-            \[ (recur restantes tortugas (conj aux tortuga-actual))
+            \[ (recur restantes tortugas (conj aux (bajar-pluma tortuga-actual)))
             \] (let [nueva-tortuga (peek aux) tortugas-aux (pop aux)] (recur restantes (conj tortugas nueva-tortuga) tortugas-aux))
             (if (contains? alfabeto operacion) (let [nueva-tortuga ((alfabeto operacion) tortuga-actual)]
                                                  (recur restantes (conj tortugas nueva-tortuga) aux))

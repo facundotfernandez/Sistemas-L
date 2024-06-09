@@ -46,14 +46,14 @@
   (let [x1 (:x origen) y1 (:y origen) p1 (:pluma origen)
         x2 (:x destino) y2 (:y destino) p2 (:pluma destino)
         tipo (if p2 " L" " M")]
-    (string/join " " [tipo (* -1 x2) y2])))
+    (string/join " " [tipo (format "%.4f" x2) (format "%.4f" y2)])))
 
 (defn actualizar-info [origen
                        destino
                        {:keys [contenido min-x min-y max-x max-y] :as info}]
-  (let [x1 (:x origen) y1 (:y origen) p1 (:pluma origen)
-        x2 (:x destino) y2 (:y destino) p2 (:pluma destino)]
-    (if (and (= x1 x2) (= y1 y2) (= p1 p2))
+  (let [x1 (:x origen) y1 (:y origen) o1 (:orientacion origen) p1 (:pluma origen)
+        x2 (:x destino) y2 (:y destino) o2 (:orientacion origen) p2 (:pluma destino)]
+    (if (and (= x1 x2) (= y1 y2) (= o1 o2) (= p1 p2))
       info
       (assoc info :contenido (apply str contenido (parse-instruccion origen destino))
                   :min-x (min min-x x2)
@@ -76,6 +76,6 @@
 
 (defn parse2svg [tortugas ruta-svg]
   (let [info (parse2path tortugas)
-        margen 5]
+        margen 10]
     (with-open [archivo (io/writer ruta-svg :encoding "UTF-8")]
-      (spit archivo (apply str "<svg viewBox=\"" (string/join " " [(- (get info :min-x) margen) (- (get info :min-y) margen) (+ (* 2 margen)(- (get info :max-x) (get info :min-x))) (+ (* 2 margen)(- (get info :max-y) (get info :min-y)))]) "\" xmlns=\"http://www.w3.org/2000/svg\">\n" (apply str (get info :contenido)) "\n</svg>")))))
+      (spit archivo (apply str "<svg viewBox=\"" (string/join " " [(- (get info :min-x) margen) (- (get info :min-y) margen) (+ (* 2 margen) (- (get info :max-x) (get info :min-x))) (+ (* 2 margen) (- (get info :max-y) (get info :min-y)))]) "\" xmlns=\"http://www.w3.org/2000/svg\">\n" (apply str (get info :contenido)) "\n</svg>")))))
