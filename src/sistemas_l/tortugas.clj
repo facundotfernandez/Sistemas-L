@@ -1,45 +1,95 @@
 (ns sistemas-l.tortugas
-  (:require [clojure.math :as Math]))
+  (:require
+    [clojure.math :as Math]))
 
 (defn crear-tortuga
-  "Crea una tortuga con estado inicial o basado en el estado dado.
-
-  Parámetros:
+  "Parámetros:
     x - Coordenada X (Píxeles).
     y - Coordenada Y (Píxeles).
     o - Orientación del siguiente movimiento (Ángulo).
     p - Estado de la pluma (activa o inactiva).
 
   Retorna:
-    Crea una tortuga con estado inicial o basado en el estado dado"
+    Una tortuga con estado inicial"
   ([] {:x           (double 0)
        :y           (double 0)
        :orientacion 270
        :pluma       true}))
 
-(defn bajar-pluma [tortuga]
+(defn subir-pluma
+  "Retorna:
+    Una nueva tortuga, peor con la pluma levantada."
+
+  [tortuga]
   (assoc tortuga :pluma false))
 
-(defn subir-pluma [tortuga]
+(defn bajar-pluma
+  "Retorna:
+    Una nueva tortuga, peor con la pluma bajada."
+  [tortuga]
   (assoc tortuga :pluma true))
 
-(defn avanzar [distancia {:keys [x y orientacion] :as tortuga}]
-  (let [angRad (* orientacion (/ Math/PI 180))
-        dx (* distancia (Math/cos angRad))
-        dy (* distancia (Math/sin angRad))]
+(defn avanzar
+  "Mueve la tortuga una cierta distancia en la direccion con la pluma bajada de su orientacion actual.
+
+  Parámetros:
+    distancia - longitud del movimiento
+
+  Retorna:
+    Una nueva tortuga con el estado actualizado luego de avanzar con las nuevas coordenadas (x, y)
+    y la pluma bajada."
+  [distancia {:keys [x y orientacion] :as tortuga}]
+  (let [ang-rad (* orientacion (/ Math/PI 180))
+        dx (* distancia (Math/cos ang-rad))
+        dy (* distancia (Math/sin ang-rad))]
     (assoc tortuga :x (double (+ x dx)) :y (double (+ y dy)) :pluma true)))
 
-(defn avanzar-sin-dibujar [distancia tortuga]
-  (->> tortuga (subir-pluma) (avanzar distancia) (bajar-pluma)))
+(defn avanzar-sin-dibujar
+  "Mueve la tortuga una cierta distancia en la direccion con la pluma subida de su orientacion actual.
 
-(defn izquierda [angulo tortuga]
-  (let [angGrad (get tortuga :orientacion)]
-    (merge tortuga {:orientacion (mod (+ angGrad angulo) 360)})))
+  Parámetros:
+    distancia - longitud del movimiento
 
-(defn derecha [angulo tortuga]
+  Retorna:
+    Una nueva tortuga con el estado actualizado luego de avanzar con las nuevas coordenadas (x, y)
+    y la pluma subida."
+  [distancia tortuga]
+  (->> tortuga (avanzar distancia) (subir-pluma)))
+
+(defn izquierda
+  "Gira la orientación de la tortuga a la izquierda por un ángulo dado a la izquierda.
+
+  Parámetros:
+    angulo - desplazamiento en grados con respecto a la orientacion actual de la tortuga.
+    tortuga.
+
+  Retorna:
+     Una nueva tortuga con el estado actualizado después del giro."
+  [angulo tortuga]
+  (let [ang-grad (:orientacion tortuga)]
+    (merge tortuga {:orientacion (mod (+ ang-grad angulo) 360)})))
+
+(defn derecha
+  "Gira la orientación de la tortuga a la izquierda por un ángulo dado a la derecha.
+
+  Parámetros:
+    angulo - desplazamiento en grados con respecto a la orientacion actual de la tortuga.
+    tortuga.
+
+  Retorna:
+     Una nueva tortuga con el estado actualizado después del giro."
+  [angulo tortuga]
   (izquierda (- angulo) tortuga))
 
-(defn crear-tortugas [op distancia angulo]
+(defn crear-tortugas
+  "Parámetros:
+    op - indica la operacion a realizar.
+    distancia - Coordenada Y (Píxeles).
+    angulo - Orientación del siguiente movimiento (Ángulo).
+
+  Retorna:
+    Una colección de estados de gráficos tortuga"
+  [op distancia angulo]
   (let [alfabeto {\F #(avanzar distancia %)
                   \G #(avanzar distancia %)
                   \f #(avanzar-sin-dibujar distancia %)
@@ -56,7 +106,7 @@
               restantes (rest operaciones)
               tortuga-actual (peek tortugas)]
           (case operacion
-            \[ (recur restantes tortugas (conj aux (bajar-pluma tortuga-actual)))
+            \[ (recur restantes tortugas (conj aux (subir-pluma tortuga-actual)))
             \] (let [nueva-tortuga (peek aux) tortugas-aux (pop aux)] (recur restantes (conj tortugas nueva-tortuga) tortugas-aux))
             (if (contains? alfabeto operacion) (let [nueva-tortuga ((alfabeto operacion) tortuga-actual)]
                                                  (recur restantes (conj tortugas nueva-tortuga) aux))
