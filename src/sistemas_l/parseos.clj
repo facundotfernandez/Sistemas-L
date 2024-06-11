@@ -4,7 +4,9 @@
     [clojure.string :as str]))
 
 (defn parse-operacion
-  "Parámetros:
+  "Aplica reglas de conversión a una operación dada.
+
+  Parámetros:
     reglas - Hashmap de reglas a aplicar para parsear.
     op - Operación a parsear.
 
@@ -58,9 +60,11 @@
     (str/join " " [(if pluma " L" " M") (format "%.4f" x) (format "%.4f" y)])))
 
 (defn actualizar-info
-  "Parámetros:
-    origen - Tortuga a comparar con el destino del movimiento.
-    destino - Tortuga a comparar con el origen del movimiento.
+  "Actualiza la información sobre el dibujo del sistema-L.
+
+  Parámetros:
+    origen - Estado de la tortuga al inicio del movimiento.
+    destino - Estado de la tortuga al final del movimiento.
     info - Información a actualizar.
 
   Retorna:
@@ -78,7 +82,9 @@
                   :max-y (max max-y y2)))))
 
 (defn parse2path
-  "Parámetros:
+  "Genera el contenido de un elemento 'path' SVG a partir de los estados de tortuga.
+
+  Parámetros:
     tortugas - Estados de los gráficos tortuga a representar en un path.
 
   Retorna:
@@ -101,7 +107,7 @@
 
   Parámetros:
     tortugas - Estados de los gráficos tortuga a representar en un svg.
-    ruta-sl - Ruta relativa del archivo a escribir."
+    ruta-sl - Ruta relativa del archivo a generar o sobreescribir."
   [tortugas ruta-svg]
   (let [info (parse2path tortugas)
         margen 50

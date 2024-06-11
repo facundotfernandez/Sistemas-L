@@ -3,7 +3,9 @@
     [clojure.math :as Math]))
 
 (defn crear-tortuga
-  "Parámetros:
+  "Crea una nueva tortuga con la posición y estado iniciales.
+
+  Parámetros:
     x - Coordenada X (Píxeles).
     y - Coordenada Y (Píxeles).
     o - Orientación del siguiente movimiento (Ángulo).
@@ -17,23 +19,33 @@
        :pluma       true}))
 
 (defn subir-pluma
-  "Retorna:
-    Una nueva tortuga, peor con la pluma levantada."
+  "Levanta la pluma de la tortuga, para que no dibuje al moverse.
 
+  Parámetros:
+    tortuga - La tortuga a modificar.
+
+  Retorna:
+    Una nueva tortuga con la pluma levantada."
   [tortuga]
   (assoc tortuga :pluma false))
 
 (defn bajar-pluma
-  "Retorna:
-    Una nueva tortuga, peor con la pluma bajada."
+  "Baja la pluma de la tortuga, para que dibuje al moverse.
+
+  Parámetros:
+    tortuga - La tortuga a modificar.
+
+  Retorna:
+    Una nueva tortuga con la pluma bajada."
   [tortuga]
   (assoc tortuga :pluma true))
 
 (defn avanzar
-  "Mueve la tortuga una cierta distancia en la direccion con la pluma bajada de su orientacion actual.
+  "Mueve la tortuga una cierta distancia en la direccion con la pluma bajada de su orientacion actual, con la pluma bajada.
 
   Parámetros:
-    distancia - longitud del movimiento
+    distancia - Longitud del movimiento
+    tortuga - La tortuga a mover.
 
   Retorna:
     Una nueva tortuga con el estado actualizado luego de avanzar con las nuevas coordenadas (x, y)
@@ -45,10 +57,11 @@
     (assoc tortuga :x (double (+ x dx)) :y (double (+ y dy)) :pluma true)))
 
 (defn avanzar-sin-dibujar
-  "Mueve la tortuga una cierta distancia en la direccion con la pluma subida de su orientacion actual.
+  "Mueve la tortuga una cierta distancia en la dirección de su orientación actual, con la pluma levantada.
 
   Parámetros:
-    distancia - longitud del movimiento
+    distancia - Longitud del movimiento
+    tortuga - La tortuga a mover.
 
   Retorna:
     Una nueva tortuga con el estado actualizado luego de avanzar con las nuevas coordenadas (x, y)
@@ -57,11 +70,11 @@
   (->> tortuga (avanzar distancia) (subir-pluma)))
 
 (defn izquierda
-  "Gira la orientación de la tortuga a la izquierda por un ángulo dado a la izquierda.
+  "Gira la orientación de la tortuga a la izquierda por un ángulo dado.
 
   Parámetros:
     angulo - desplazamiento en grados con respecto a la orientacion actual de la tortuga.
-    tortuga.
+    tortuga - La tortuga a girar.
 
   Retorna:
      Una nueva tortuga con el estado actualizado después del giro."
@@ -70,11 +83,11 @@
     (merge tortuga {:orientacion (mod (+ ang-grad angulo) 360)})))
 
 (defn derecha
-  "Gira la orientación de la tortuga a la izquierda por un ángulo dado a la derecha.
+  "Gira la orientación de la tortuga a la derecha por un ángulo dado.
 
   Parámetros:
     angulo - desplazamiento en grados con respecto a la orientacion actual de la tortuga.
-    tortuga.
+    tortuga - La tortuga a girar.
 
   Retorna:
      Una nueva tortuga con el estado actualizado después del giro."
@@ -82,7 +95,9 @@
   (izquierda (- angulo) tortuga))
 
 (defn crear-tortugas
-  "Parámetros:
+  "Crea una colección de tortugas basada en las operaciones de un sistema-L.
+
+  Parámetros:
     op - indica la operacion a realizar.
     distancia - Coordenada Y (Píxeles).
     angulo - Orientación del siguiente movimiento (Ángulo).

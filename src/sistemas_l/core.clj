@@ -5,12 +5,15 @@
     [sistemas-l.tortugas :as tortugas]))
 
 (defn generar-operaciones!
-  "Parámetros:
-    ruta-sl - Ruta relativa del archivo a leer con la información del sistema-L.
-    iteraciones - Cantidad de procesamientos a realizar sobre el axioma inicial del sistema-L.
+  "Genera una lista de operaciones a partir de un archivo que contiene la información
+   de un sistema-L y una cantidad de iteraciones dada.
 
-  Retorna:
-    La operación ya procesada según el archivo de información del sistema-L dado y la cantidad de iteraciones indicada."
+   Parámetros:
+     ruta-sl - Ruta relativa del archivo que contiene la información del sistema-L.
+     iteraciones - Cantidad de veces que se aplicarán las reglas del sistema-L al axioma inicial.
+
+   Retorna:
+     La lista de operaciones resultantes después de aplicar las reglas del sistema-L."
   [ruta-sl iteraciones]
   (let [info (parseos/parse-sl! ruta-sl)] (parseos/parse-operaciones (:reglas info) (:axioma info) iteraciones)))
 
