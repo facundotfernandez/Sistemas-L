@@ -13,7 +13,7 @@
      iteraciones - Cantidad de veces que se aplicarán las reglas del sistema-L al axioma inicial.
 
    Retorna:
-     La lista de operaciones resultantes después de aplicar las reglas del sistema-L."
+     La operacion resultante después de aplicar las reglas del sistema-L."
   [ruta-sl iteraciones]
   (let [info (parseos/parse-sl! ruta-sl)] (parseos/parse-operaciones (:reglas info) (:axioma info) iteraciones)))
 
