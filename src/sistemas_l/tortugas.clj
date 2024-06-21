@@ -54,7 +54,7 @@
   (let [ang-rad (* orientacion (/ Math/PI 180))
         dx (* distancia (Math/cos ang-rad))
         dy (* distancia (Math/sin ang-rad))]
-    (assoc tortuga :x (double (+ x dx)) :y (double (+ y dy)) :pluma true)))
+    (bajar-pluma (assoc tortuga :x (double (+ x dx)) :y (double (+ y dy))))))
 
 (defn avanzar-sin-dibujar
   "Mueve la tortuga una cierta distancia en la dirección de su orientación actual, con la pluma levantada.

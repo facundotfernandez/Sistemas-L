@@ -54,10 +54,11 @@
     destino - Tortuga de destino del movimiento.
 
   Retorna:
-    Una cadena con los datos del movimiento con coordenadas y su tipo, formateados para usar en un path de svg."
+    Una cadena con los datos del movimiento con coordenadas y su tipo, formateados
+    (con '.' como separador de decimales) para usar en un path de svg."
   [destino]
   (let [{:keys [x y pluma]} destino]
-    (str/join " " [(if pluma " L" " M") (format "%.4f" x) (format "%.4f" y)])))
+    (str/replace (str/join " " [(if pluma " L" " M") (format "%.4f" x) (format "%.4f" y)]) "," ".")))
 
 (defn actualizar-info
   "Actualiza la información sobre el dibujo del sistema-L.
