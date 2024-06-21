@@ -103,6 +103,21 @@
         (assoc info :contenido (str (:contenido info) "\" stroke-width=\"1\" stroke=\"black\" fill=\"none\"></path>"))
         (recur (first restantes) (rest restantes) (actualizar-info origen (first restantes) info))))))
 
+(defn crear-info-viewbox
+  "Genera la información de un atributo viewBox con los datos dados.
+
+  Parámetros:
+    min-x - Coordenada mínima en el eje X.
+    max-y - Coordenada mínima en el eje Y.
+    min-x - Coordenada máxima en el eje X.
+    max-y - Coordenada máxima en el eje Y.
+    margen - Margen adicional a añadir alrededor del área del dibujo.
+
+  Retorna:
+    Una cadena de texto que representa el atributo viewBox del SVG con los valores calculados y el margen incluido"
+  [min-x min-y max-x max-y margen]
+  (str/replace (str/join " " [(- min-x margen) (- min-y margen) (+ (* 2 margen) (- max-x min-x)) (+ (* 2 margen) (- max-y min-y))]) "," "."))
+
 (defn parse2svg!
   "Crea o sobreescribe un archivo (si ya existe) en base a los gráficos tortuga dados.
 
@@ -118,9 +133,6 @@
         max-y (:max-y info)]
     (with-open [archivo (io/writer ruta-svg :encoding "UTF-8")]
       (spit archivo (str "<svg viewBox=\""
-                         (- min-x margen) " "
-                         (- min-y margen) " "
-                         (+ (* 2 margen) (- max-x min-x)) " "
-                         (+ (* 2 margen) (- max-y min-y))
+                         (crear-info-viewbox min-x min-y max-x max-y margen)
                          "\" xmlns=\"http://www.w3.org/2000/svg\">\n"
                          (:contenido info) "\n</svg>")))))
