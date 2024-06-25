@@ -47,6 +47,22 @@
     operaciones
     (recur reglas (parse-operacion reglas operaciones) (dec iteraciones))))
 
+(defn format-num
+  "Formatea un número flotante y lo retorna con 4 decimales.
+
+  Parámetros:
+    num - Número a formatear."
+  [num] (format "%.4f" num))
+
+(defn unir-y-reemplazar-comas
+  "Une los elementos de la colección dada con un espacio como separador y
+  reemplaza las comas por puntos.
+
+  Parámetros:
+    coll - Collecion de elementos a procesar."
+  [coll]
+  (str/replace (str/join " " coll) "," "."))
+
 (defn parse-movimiento
   "Parsea un movimiento para escribir en un path de svg, según los datos dados.
 
@@ -58,7 +74,7 @@
     (con '.' como separador de decimales) para usar en un path de svg."
   [destino]
   (let [{:keys [x y pluma]} destino]
-    (str/replace (str/join " " [(if pluma " L" " M") (format "%.4f" x) (format "%.4f" y)]) "," ".")))
+    (unir-y-reemplazar-comas [(if pluma " L" " M") (format-num x) (format-num y)])))
 
 (defn actualizar-info
   "Actualiza la información sobre el dibujo del sistema-L.
@@ -116,7 +132,8 @@
   Retorna:
     Una cadena de texto que representa el atributo viewBox del SVG con los valores calculados y el margen incluido"
   [min-x min-y max-x max-y margen]
-  (str/replace (str/join " " [(- min-x margen) (- min-y margen) (+ (* 2 margen) (- max-x min-x)) (+ (* 2 margen) (- max-y min-y))]) "," "."))
+  (let [dimensiones [(- min-x margen) (- min-y margen) (+ (* 2 margen) (- max-x min-x)) (+ (* 2 margen) (- max-y min-y))]]
+    (unir-y-reemplazar-comas (map format-num dimensiones))))
 
 (defn parse2svg!
   "Crea o sobreescribe un archivo (si ya existe) en base a los gráficos tortuga dados.
@@ -126,7 +143,7 @@
     ruta-sl - Ruta relativa del archivo a generar o sobreescribir."
   [tortugas ruta-svg]
   (let [info (parse2path tortugas)
-        margen 50
+        margen (double 50)
         min-x (:min-x info)
         min-y (:min-y info)
         max-x (:max-x info)
